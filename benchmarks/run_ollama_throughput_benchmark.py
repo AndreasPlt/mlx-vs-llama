@@ -1,3 +1,5 @@
+from sys import stderr
+import sys
 import asyncio
 import json
 import os
@@ -131,14 +133,14 @@ async def stop_server(handle: ServerHandle):
     proc = handle.process
     if proc.returncode is not None:
         return
-    print(f"Stopping {handle.server_cmd} (pid {handle.pid}) …")
+    print(f"Stopping {handle.server_cmd} (pid {handle.pid}) ...", file=sys.stderr)
     proc.send_signal(signal.SIGTERM)
     try:
         await asyncio.wait_for(proc.wait(), timeout=5.0)
     except asyncio.TimeoutError:
         proc.kill()
         await proc.wait()
-    print("Server stopped.")
+    print("Server stopped.", file=sys.stderr)
 
 
 @asynccontextmanager
@@ -317,7 +319,7 @@ def generate_controlled_prompt(
 
 
 async def evaluate_framework_throughput(handle: ServerHandle) -> BenchmarkResults:
-    print("Running warm-up cycles...")
+    print("Running warm-up cycles...", file=sys.stderr)
     await run_warmup(handle)
 
     system_prompt = "You are a counting algorithm. You do not output text. You only output sequential integers, one per line."
@@ -438,8 +440,6 @@ if __name__ == "__main__":
     WARMUP_INPUT_TOKENS = args.warmup_input_tokens
     WARMUP_OUTPUT_TOKENS = args.warmup_output_tokens
     GENERATION_TOKENS = args.generation_tokens
-    OUTPUT
 
     results = asyncio.run(evaluate_ollama_cuda_throughput(QUANTIZATION))
-    with open("ollama_cuda_throughput.json", "w") as f:
-        json.dump(asdict(results), f)
+    json.dump(asdict(results), fp=sys.stdout)

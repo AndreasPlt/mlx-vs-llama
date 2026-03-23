@@ -448,16 +448,18 @@ dependencies = [
     { name = "faker" },
     { name = "llama-cpp-python" },
     { name = "psutil" },
-    { name = "torch" },
     { name = "transformers" },
+]
+
+[package.optional-dependencies]
+cuda = [
+    { name = "nvidia-ml-py" },
+    { name = "pynvml" },
+    { name = "torch" },
     { name = "zeus" },
 ]
 
 [package.dev-dependencies]
-cuda = [
-    { name = "nvidia-ml-py" },
-    { name = "pynvml" },
-]
 dev = [
     { name = "pyrefly" },
     { name = "ruff" },
@@ -469,17 +471,16 @@ requires-dist = [
     { name = "aiohttp", specifier = ">=3.13.3" },
     { name = "faker", specifier = ">=40.11.0" },
     { name = "llama-cpp-python", specifier = ">=0.3.16" },
+    { name = "nvidia-ml-py", marker = "extra == 'cuda'", specifier = ">=13.590.48" },
     { name = "psutil", specifier = ">=7.2.2" },
-    { name = "torch", specifier = ">=2.10.0" },
+    { name = "pynvml", marker = "extra == 'cuda'", specifier = ">=13.0.1" },
+    { name = "torch", marker = "extra == 'cuda'", specifier = ">=2.10.0" },
     { name = "transformers", specifier = ">=5.3.0" },
-    { name = "zeus", specifier = ">=0.15.0" },
+    { name = "zeus", marker = "extra == 'cuda'", specifier = ">=0.15.0" },
 ]
+provides-extras = ["cuda"]
 
 [package.metadata.requires-dev]
-cuda = [
-    { name = "nvidia-ml-py", specifier = ">=13.590.48" },
-    { name = "pynvml", specifier = ">=13.0.1" },
-]
 dev = [
     { name = "pyrefly", specifier = ">=0.57.1" },
     { name = "ruff", specifier = ">=0.15.6" },
@@ -824,11 +825,11 @@ wheels = [
 
 [[package]]
 name = "nvidia-ml-py"
-version = "13.590.48"
+version = "13.595.45"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/af/a0/f4fc18cf72f06821a9a665085435b901449986855519d5b3843532db35e9/nvidia_ml_py-13.590.48.tar.gz", hash = "sha256:8184d1be52914ac7f0991cd1c0d946c65dc88a840c754cd12c274b77b88760dd", size = 49732, upload-time = "2026-01-22T01:14:56.456Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ce/49/c29f6e30d8662d2e94fef17739ea7309cc76aba269922ae999e4cc07f268/nvidia_ml_py-13.595.45.tar.gz", hash = "sha256:c9f34897fe0441ff35bc8f35baf80f830a20b0f4e6ce71e0a325bc0e66acf079", size = 50780, upload-time = "2026-03-19T16:59:44.956Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fd/72/fb2af0d259a651affdce65fd6a495f0e07a685a0136baf585c5065204ee7/nvidia_ml_py-13.590.48-py3-none-any.whl", hash = "sha256:fd43d30ee9cd0b7940f5f9f9220b68d42722975e3992b6c21d14144c48760e43", size = 50680, upload-time = "2026-01-22T01:14:55.281Z" },
+    { url = "https://files.pythonhosted.org/packages/8a/24/fc256107d23597fa33d319505ce77160fa1a2349c096d01901ffc7cb7fc4/nvidia_ml_py-13.595.45-py3-none-any.whl", hash = "sha256:b65a7977f503d56154b14d683710125ef93594adb63fbf7e559336e3318f1376", size = 51776, upload-time = "2026-03-19T16:59:43.603Z" },
 ]
 
 [[package]]

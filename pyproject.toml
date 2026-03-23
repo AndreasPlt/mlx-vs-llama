@@ -9,16 +9,17 @@ dependencies = [
     "faker>=40.11.0",
     "llama-cpp-python>=0.3.16",
     "psutil>=7.2.2",
-    "torch>=2.10.0",
     "transformers>=5.3.0",
-    "zeus>=0.15.0",
 ]
 
-[dependency-groups]
+[project.optional-dependencies]
 cuda = [
     "nvidia-ml-py>=13.590.48",
     "pynvml>=13.0.1",
+    "torch>=2.10.0",
+    "zeus>=0.15.0",
 ]
+[dependency-groups]
 dev = [
     "pyrefly>=0.57.1",
     "ruff>=0.15.6",

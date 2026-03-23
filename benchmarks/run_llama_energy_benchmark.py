@@ -1,10 +1,10 @@
+import sys
 import json
 import time
 from dataclasses import asdict, dataclass
 from enum import Enum
 
 import llama_cpp
-import numpy as np
 from faker import Faker
 from zeus.monitor.energy import Measurement, ZeusMonitor
 
@@ -170,7 +170,7 @@ def run_llama_cuda_energy_benchmark(quantization: Quantization):
     )
 
     for warmup_id in range(WARMUP_RUNS):
-        print(f"Warmup run {warmup_id + 1}/{WARMUP_RUNS}...")
+        print(f"Warmup run {warmup_id + 1}/{WARMUP_RUNS}..., file=sys.stderr")
         # Count prompt tokens with llama-cpp's own tokenizer
         prompt = generate_random_token_prompt(
             tokenizer=llm.tokenizer(), num_tokens=PROMPT_TOKENS, seed=-1 - warmup_id
@@ -180,7 +180,7 @@ def run_llama_cuda_energy_benchmark(quantization: Quantization):
 
     measurements = []
     for run_id in range(REPEAT_RUNS):
-        print(f"Measured run {run_id + 1}/{REPEAT_RUNS}...")
+        print(f"Measured run {run_id + 1}/{REPEAT_RUNS}..., file=sys.stderr")
         prompt = generate_random_token_prompt(
             tokenizer=llm.tokenizer(), num_tokens=PROMPT_TOKENS, seed=run_id
         )
@@ -255,7 +255,6 @@ if __name__ == "__main__":
 
     measurements = run_llama_cuda_energy_benchmark(args.quantization)
 
-    # Save results to jsonl
-    with open(f"llama_cuda_energy_{args.quantization.value}.jsonl", "w") as f:
-        for m in measurements:
-            f.write(json.dumps(asdict(m)) + "\n")
+    # Output results as jsonl
+    for m in measurements:
+        print(json.dumps(asdict(m)), file=sys.stdout)
