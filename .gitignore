@@ -12,6 +12,7 @@ wheels/
 
 # Miscellaneous
 .zed
+.models/
 
 # Results
-results/
+.results/

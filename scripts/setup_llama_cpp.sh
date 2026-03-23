@@ -26,13 +26,15 @@ case "$BACKEND" in
         ;;
 esac
 
-cd "$(dirname "$0")/llama.cpp"
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+cd "$SCRIPT_DIR/../llama.cpp"
 
 echo "Building llama.cpp with backend: $BACKEND"
 cmake -B build $CMAKE_FLAGS
 cmake --build build --config Release -j
 
 echo "Downloading models..."
-cd ..
-"$(dirname "$0")/install_qwen.sh"
+cd "$SCRIPT_DIR/.."
+"$SCRIPT_DIR/install_qwen.sh"
 echo "Done."
