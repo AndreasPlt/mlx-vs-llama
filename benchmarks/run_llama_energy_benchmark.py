@@ -170,7 +170,7 @@ def run_llama_cuda_energy_benchmark(quantization: Quantization):
     )
 
     for warmup_id in range(WARMUP_RUNS):
-        print(f"Warmup run {warmup_id + 1}/{WARMUP_RUNS}..., file=sys.stderr")
+        print(f"Warmup run {warmup_id + 1}/{WARMUP_RUNS}...", file=sys.stderr)
         # Count prompt tokens with llama-cpp's own tokenizer
         prompt = generate_random_token_prompt(
             tokenizer=llm.tokenizer(), num_tokens=PROMPT_TOKENS, seed=-1 - warmup_id
@@ -180,7 +180,7 @@ def run_llama_cuda_energy_benchmark(quantization: Quantization):
 
     measurements = []
     for run_id in range(REPEAT_RUNS):
-        print(f"Measured run {run_id + 1}/{REPEAT_RUNS}..., file=sys.stderr")
+        print(f"Measured run {run_id + 1}/{REPEAT_RUNS}...", file=sys.stderr)
         prompt = generate_random_token_prompt(
             tokenizer=llm.tokenizer(), num_tokens=PROMPT_TOKENS, seed=run_id
         )
