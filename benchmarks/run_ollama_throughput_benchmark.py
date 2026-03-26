@@ -326,7 +326,7 @@ async def evaluate_framework_throughput(handle: ServerHandle) -> BenchmarkResult
 
     user_msgs = [
         generate_controlled_prompt(
-            tokenizer=TOKENIZER, run_id=run, cycle=0, agent_id="0", target_tokens=1024
+            tokenizer=TOKENIZER, run_id=run, cycle=0, agent_id="0", target_tokens=PROMPT_TOKENS
         )
         for run in range(REPEAT_RUNS)
     ]
@@ -423,6 +423,12 @@ def parse_args():
         help="Number of tokens to generate during warm-up.",
     )
     parser.add_argument(
+        "--prompt-tokens",
+        type=int,
+        default=1024,
+        help="Number of prompt tokens to process during the benchmark."
+    )
+    parser.add_argument(
         "--generation-tokens",
         type=int,
         default=1024,
@@ -439,6 +445,7 @@ if __name__ == "__main__":
     WARMUP_SYSTEM_PROMPT_TOKENS = args.warmup_system_prompt_tokens
     WARMUP_INPUT_TOKENS = args.warmup_input_tokens
     WARMUP_OUTPUT_TOKENS = args.warmup_output_tokens
+    PROMPT_TOKENS = args.prompt_tokens
     GENERATION_TOKENS = args.generation_tokens
 
     results = asyncio.run(evaluate_ollama_cuda_throughput(QUANTIZATION))

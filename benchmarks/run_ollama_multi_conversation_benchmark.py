@@ -1,4 +1,3 @@
-import pynvml
 import argparse
 import asyncio
 import json
@@ -12,6 +11,7 @@ from typing import Self
 
 import aiohttp
 import psutil
+import pynvml
 from faker import Faker
 from transformers import AutoTokenizer
 
@@ -303,13 +303,6 @@ def count_tokens_in_messages(messages: list[dict]) -> int:
     return len(tok.encode(rendered))  # ty:ignore[unresolved-attribute]
 
 
-# ── Benchmark constants ───────────────────────────────────────────────────────
-
-WARMUP_SYSTEM_PROMPT_TOKENS = 64
-WARMUP_INPUT_TOKENS = 64
-WARMUP_OUTPUT_TOKENS = 16
-
-
 # ── Benchmark logic ───────────────────────────────────────────────────────────
 
 
@@ -363,9 +356,11 @@ async def run_multi_conversation_run(
         server_process = psutil.Process(handle.pid)
     except psutil.NoSuchProcess:
         raise RuntimeError(f"Server PID {handle.pid} not found.")
-    
+
     pynvml.nvmlInit()
-    gpu_handle = pynvml.nvmlDeviceGetHandleByIndex(int(os.environ.get("CUDA_VISIBLE_DEVICES", 0)))  # Assuming single GPU for simplicity
+    gpu_handle = pynvml.nvmlDeviceGetHandleByIndex(
+        int(os.environ.get("CUDA_VISIBLE_DEVICES", 0))
+    )  # Assuming single GPU for simplicity
     histories: dict[str, list[dict]] = {
         agent: [{"role": "system", "content": system_prompt}] for agent in AGENTS
     }
@@ -450,7 +445,7 @@ async def run_ollama_cuda_multi_conversation_benchmark() -> list[ConversationRun
 
     ollama_env = {
         "OLLAMA_CONTEXT_LENGTH": str(CONTEXT_LENGTH),
-        "OLLAMA_NUM_PARALLEL": str(len(AGENTS)),
+        "OLLAMA_NUM_PARALLEL": str(NUM_PARALLEL),
     }
 
     for run_id in range(1):
@@ -513,6 +508,30 @@ def parse_args():
         default=16384,
         help="Context length for the model.",
     )
+    parser.add_argument(
+        "--num-parallel-conversations",
+        type=int,
+        default=0,
+        help="Number of parallel conversations to simulate. If < 1, it will be set to the number of agents."
+    )
+    parser.add_argument(
+        "--warmup-system-prompt-tokens",
+        type=int,
+        default=64,
+        help="Number of tokens in the system prompt used for warm-up before the main benchmark runs.",
+    )
+    parser.add_argument(
+        "--warmup-input-tokens",
+        type=int,
+        default=64,
+        help="Number of tokens in the user prompt used for warm-up before the main benchmark runs.",
+    )
+    parser.add_argument(
+        "--warmup-output-tokens",
+        type=int,
+        default=16,
+        help="Number of tokens to request in the generation during warm-up before the main benchmark runs.",
+    )
     return parser.parse_args()
 
 
@@ -523,7 +542,11 @@ if __name__ == "__main__":
     AGENTS = args.agents
     USER_MSG_TOKENS = args.user_msg_tokens
     MAX_CYCLE_TOKENS = args.max_cycle_tokens
+    NUM_PARALLEL = args.num_parallel if args.num_parallel > 0 else len(AGENTS)
     CONTEXT_LENGTH = args.context_length
+    WARMUP_SYSTEM_PROMPT_TOKENS = args.warmup_system_prompt_tokens
+    WARMUP_INPUT_TOKENS = args.warmup_input_tokens
+    WARMUP_OUTPUT_TOKENS = args.warmup_output_tokens
 
     final_results = asyncio.run(run_ollama_cuda_multi_conversation_benchmark())
 
