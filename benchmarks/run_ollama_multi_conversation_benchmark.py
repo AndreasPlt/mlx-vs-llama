@@ -137,14 +137,14 @@ async def stop_server(handle: ServerHandle):
     proc = handle.process
     if proc.returncode is not None:
         return
-    print(f"Stopping {handle.server_cmd} (pid {handle.pid}) …")
+    print(f"Stopping {handle.server_cmd} (pid {handle.pid}) ...", file=sys.stderr)
     proc.send_signal(signal.SIGTERM)
     try:
         await asyncio.wait_for(proc.wait(), timeout=5.0)
     except asyncio.TimeoutError:
         proc.kill()
         await proc.wait()
-    print("Server stopped.")
+    print("Server stopped.", file=sys.stderr)
 
 
 @asynccontextmanager
@@ -334,7 +334,7 @@ async def run_multi_conversation_run(
     handle: ServerHandle, run_id: int
 ) -> ConversationRunResult:
 
-    print("Running warm-up cycles...")
+    print("Running warm-up cycles...", file=sys.stderr)
     await run_warmup(handle)
 
     system_prompt = "You are a counting algorithm. You do not output text. You only output sequential integers, one per line."
@@ -448,7 +448,7 @@ async def run_ollama_cuda_multi_conversation_benchmark() -> list[ConversationRun
         "OLLAMA_NUM_PARALLEL": str(NUM_PARALLEL),
     }
 
-    for run_id in range(1):
+    for run_id in range(2):
         async with run_server(
             server_cmd="ollama serve",
             model="qwen2.5:14b-instruct-q4_K_M",
@@ -456,7 +456,7 @@ async def run_ollama_cuda_multi_conversation_benchmark() -> list[ConversationRun
             **ollama_env,
         ) as handle:
             print(
-                f"Running multi-conversation Ollama benchmark against server at {handle.url} ..."
+                f"Running multi-conversation Ollama benchmark against server at {handle.url} ...", file=sys.stderr
             )
             ollama_multi_conv_results = await run_multi_conversation_run(
                 handle, run_id=run_id
@@ -542,7 +542,7 @@ if __name__ == "__main__":
     AGENTS = args.agents
     USER_MSG_TOKENS = args.user_msg_tokens
     MAX_CYCLE_TOKENS = args.max_cycle_tokens
-    NUM_PARALLEL = args.num_parallel if args.num_parallel > 0 else len(AGENTS)
+    NUM_PARALLEL = args.num_parallel_conversations if args.num_parallel_conversations > 0 else len(AGENTS)
     CONTEXT_LENGTH = args.context_length
     WARMUP_SYSTEM_PROMPT_TOKENS = args.warmup_system_prompt_tokens
     WARMUP_INPUT_TOKENS = args.warmup_input_tokens
@@ -551,7 +551,6 @@ if __name__ == "__main__":
     final_results = asyncio.run(run_ollama_cuda_multi_conversation_benchmark())
 
     # Output results as JSONL
-    with open("ollama_cuda_multi_conv_results.jsonl", "w") as f:
-        for run_results in final_results:
-            json_line = json.dumps(asdict(run_results))
-            f.write(json_line + "\n")
+    for run_results in final_results:
+        json_line = json.dumps(asdict(run_results))
+        print(json_line)
