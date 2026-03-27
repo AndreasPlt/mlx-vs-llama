@@ -26,6 +26,7 @@ jupyter = [
     "jupyter>=1.1.1",
     "matplotlib>=3.10.8",
     "numpy>=2.4.3",
+    "paramiko>=4.0.0",
 ]
 
 [tool.uv.sources]
